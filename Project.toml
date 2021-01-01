@@ -1,0 +1,9 @@
+name = "TelegramClient"
+uuid = "0c50e747-7910-4d75-be1d-ae33d9528add"
+authors = ["Alexander Plavin <alexander@plav.in>"]
+version = "0.1.0"
+
+[deps]
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
+tdlib_jll = "63c06ef4-2f95-5fbf-998a-91d339ce34d6"
