@@ -1,4 +1,4 @@
-import tdlib_jll: libtdjson
+import TDLib_jll: libtdjson
 import JSON3 as JSON
 
 
