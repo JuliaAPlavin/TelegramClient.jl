@@ -1,18 +1,5 @@
-using StructTypes
-
-Base.@kwdef struct AuthParameters
-    api_id::Int
-    api_hash::String
-    phone_number::String
-    encryption_key::String = ""
-    get_authentication_code::Function = () -> Base.prompt("Authentication code")
-    get_password::Function = () -> Base.prompt("Password")
-end
-StructTypes.StructType(::Type{AuthParameters}) = StructTypes.DictType()
-StructTypes.construct(::Type{AuthParameters}, x::Dict) = AuthParameters(; (k => v for (k, v) in x)...)
-
-
 handle_conn_step(client::Client, params::AuthParameters, evt::Nothing) = nothing
+
 function handle_conn_step(client::Client, params::AuthParameters, evt)
     type = evt["@type"]
     if type == "ok"
@@ -68,5 +55,3 @@ function handle_conn_step(client::Client, params::AuthParameters, evt)
         client.last_state = typ
     end
 end
-
-is_ready(client::Client) = client.is_authorized && client.is_connected
