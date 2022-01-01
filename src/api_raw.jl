@@ -33,7 +33,9 @@ end
 
 function receive(client::Client; kwargs...)
     res = receive(; kwargs...)
-    res["@client_id"] == client.tdlib_id || throw(TDError("Received event for wrong client id: $(res["@client_id"]), expected $(client.id)", res))
+    if !isnothing(res) && res["@client_id"] != client.tdlib_id
+        throw(TDError("Received event for wrong client id: $(res["@client_id"]), expected $(client.tdlib_id)", res))
+    end
     return res
 end
 
