@@ -2,7 +2,7 @@ import TDLib_jll: libtdjson
 import JSON3
 import StructTypes
 
-
+""" TDLib settings. They are sent to the library as-is. """
 Base.@kwdef struct Settings
     database_directory::String = "tdlib"
     use_file_database::Bool = false
@@ -17,6 +17,9 @@ Base.@kwdef struct Settings
 end
 Base.Dict(s::Settings) = Dict(k => getfield(s, k) for k in fieldnames(Settings))
 
+""" TDLib authentication parameters.
+
+Obtain the API ID and hash from Telegram, and put it here together with your account phone number. """
 Base.@kwdef struct AuthParameters
     api_id::Int
     api_hash::String
@@ -29,6 +32,9 @@ StructTypes.StructType(::Type{AuthParameters}) = StructTypes.DictType()
 StructTypes.construct(::Type{AuthParameters}, x::Dict) = AuthParameters(; (k => v for (k, v) in x)...)
 
 
+""" Telegram client struct.
+
+Contains TDLib settings, authentication parameters, and its current state. """
 Base.@kwdef mutable struct Client
     settings::Settings = Settings()
     auth_parameters::AuthParameters
@@ -43,6 +49,7 @@ function Client(f::Function, args...; kwargs...)
     f(client)
 end
 
+""" Returns whether the client is ready to use: connected and authorized. """
 is_ready(client::Client) = client.is_authorized && client.is_connected
 
 Base.@kwdef struct TDError <: Exception

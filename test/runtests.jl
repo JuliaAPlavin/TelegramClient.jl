@@ -4,6 +4,7 @@ using Test
 
 # using Logging; ConsoleLogger(stdout, Logging.Debug) |> global_logger
 
+auth_file = joinpath(@__DIR__, "auth_params.json")
 auth_params_empty = TG.AuthParameters(api_id=0, api_hash="", phone_number="")
 
 @testset "client basic" begin
@@ -20,7 +21,6 @@ auth_params_empty = TG.AuthParameters(api_id=0, api_hash="", phone_number="")
 end
 
 @testset "real login" begin
-    auth_file = joinpath(@__DIR__, "auth_params.json")
     isfile(auth_file) || @info """For testing real log in, create a JSON file "auth_params.json" in the test folder and fill it with your details:
     {
         "api_id": ***,
@@ -41,3 +41,11 @@ end
 
 import CompatHelperLocal as CHL
 CHL.@check()
+
+# doctests don't work together with the login test above
+# if isfile(auth_file)
+#     using Documenter, DocumenterMarkdown
+#     makedocs(format=Markdown(), modules=[TG], root="../docs")
+#     mv("../docs/build/README.md", "../README.md", force=true)
+#     rm("../docs/build", recursive=true)
+# end

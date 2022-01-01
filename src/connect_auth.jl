@@ -46,6 +46,12 @@ function handle_conn_auth_step(client::Client, evt)
     end
 end
 
+""" Perform the TDLib connection and authorization sequence.
+
+`client` must contain valid authorization parameters.
+`timeout_each` is the timeout for each internal `receive` call.
+Returns all events received in the process, in case they are useful for the application.
+"""
 function connect_authorize(client; timeout_each)
     events = []
     send_method(client, :getAuthorizationState)
