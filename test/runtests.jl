@@ -42,10 +42,8 @@ end
 import CompatHelperLocal as CHL
 CHL.@check()
 
-# doctests don't work together with the login test above
-# if isfile(auth_file)
-#     using Documenter, DocumenterMarkdown
-#     makedocs(format=Markdown(), modules=[TG], root="../docs")
-#     mv("../docs/build/README.md", "../README.md", force=true)
-#     rm("../docs/build", recursive=true)
-# end
+# # doctests don't work together with tests above
+# using Documenter, DocumenterMarkdown
+# makedocs(format=Markdown(), modules=[TG], root="../docs")
+# mv("../docs/build/README.md", "../README.md", force=true)
+# rm("../docs/build", recursive=true)
