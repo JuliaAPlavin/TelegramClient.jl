@@ -15,6 +15,7 @@ Base.@kwdef struct Settings
     system_version::String = "Linux"
     application_version::String = "1.0"
 end
+Base.Dict(s::Settings) = Dict(k => getfield(s, k) for k in fieldnames(Settings))
 
 Base.@kwdef struct AuthParameters
     api_id::Int

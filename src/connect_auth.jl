@@ -26,19 +26,9 @@ function handle_conn_step(client::Client, evt)
             send_method(
                 client,
                 :setTdlibParameters,
-                parameters=Dict(
-                    "database_directory" => "tdlib",
-                    "use_file_database" => false,
-                    "use_chat_info_database" => false,
-                    "use_message_database" => false,
-                    "enable_storage_optimizer" => true,
-                    "use_secret_chats" => false,
-                    "api_id" => client.auth_parameters.api_id,
-                    "api_hash" => client.auth_parameters.api_hash,
-                    "system_language_code" => "en",
-                    "device_model" => "Desktop",
-                    "system_version" => "Linux",
-                    "application_version" => "1.0",
+                parameters=merge(
+                    Dict(client.settings),
+                    Dict("api_id" => client.auth_parameters.api_id, "api_hash" => client.auth_parameters.api_hash),
                 )
             )
         elseif typ == "authorizationStateWaitEncryptionKey"
