@@ -21,22 +21,21 @@ end
 
 @testset "real login" begin
     auth_file = joinpath(@__DIR__, "auth_params.json")
+    isfile(auth_file) || @info """For testing real log in, create a JSON file "auth_params.json" in the test folder and fill it with your details:
+    {
+        "api_id": ***,
+        "api_hash": "***",
+        "phone_number": "***"
+    }"""
+
     if isfile(auth_file)
         params = JSON3.read(read(auth_file, String), TG.AuthParameters)
+
         TG.Client(auth_parameters=params) do client
-            TG.send_method(client, :getAuthorizationState)
-            while !TG.is_ready(client)
-                TG.handle_conn_step(client, TG.receive(client, timeout=1))
-            end
+            events = TG.connect_authorize(client, timeout_each=1)
+            @test length(events) > 5
             @test TG.is_ready(client)
         end
-    else
-        @info """For testing real log in, create a JSON file "auth_params.json" in the test folder and fill it with your details:
-        {
-            "api_id": ***,
-            "api_hash": "***",
-            "phone_number": "***"
-        }"""
     end
 end
 

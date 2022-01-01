@@ -1,6 +1,6 @@
-handle_conn_step(client::Client, evt::Nothing) = nothing
+handle_conn_auth_step(client::Client, evt::Nothing) = nothing
 
-function handle_conn_step(client::Client, evt)
+function handle_conn_auth_step(client::Client, evt)
     type = evt["@type"]
     if type == "ok"
         client.last_state = "$(client.last_state): ok"
@@ -44,4 +44,15 @@ function handle_conn_step(client::Client, evt)
         end
         client.last_state = typ
     end
+end
+
+function connect_authorize(client; timeout_each)
+    events = []
+    send_method(client, :getAuthorizationState)
+    while !is_ready(client)
+        evt = receive(client, timeout=timeout_each)
+        push!(events, evt)
+        handle_conn_auth_step(client, evt)
+    end
+    return events
 end
