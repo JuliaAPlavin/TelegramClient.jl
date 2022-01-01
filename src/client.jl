@@ -32,7 +32,7 @@ StructTypes.construct(::Type{AuthParameters}, x::Dict) = AuthParameters(; (k => 
 Base.@kwdef mutable struct Client
     settings::Settings = Settings()
     auth_parameters::AuthParameters
-    tdlib_ptr::Ptr{Cvoid} = (ptr = @ccall libtdjson.td_json_client_create()::Ptr{Cvoid}; @assert ptr != C_NULL; ptr)
+    tdlib_id::Int = @ccall libtdjson.td_create_client_id()::Int32
     is_authorized::Bool = false
     is_connected::Bool = false
     last_state::Union{Nothing,String} = nothing
@@ -40,14 +40,9 @@ end
 
 function Client(f::Function, args...; kwargs...)
     client = Client(args...; kwargs...)
-    try
-        f(client)
-    finally
-        destroy(client)
-    end
+    f(client)
 end
 
-is_created(c::Client) = c.tdlib_ptr != C_NULL
 is_ready(client::Client) = client.is_authorized && client.is_connected
 
 Base.@kwdef struct TDError <: Exception
