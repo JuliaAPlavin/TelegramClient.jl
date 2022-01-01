@@ -1,11 +1,16 @@
-using Setfield
+using StructTypes
 
 Base.@kwdef struct AuthParameters
     api_id::Int
     api_hash::String
     phone_number::String
+    encryption_key::String = ""
+    get_authentication_code::Function = () -> Base.prompt("Authentication code")
+    get_password::Function = () -> Base.prompt("Password")
 end
-JSON.StructTypes.StructType(::Type{AuthParameters}) = JSON.StructTypes.Struct()
+StructTypes.StructType(::Type{AuthParameters}) = StructTypes.DictType()
+StructTypes.construct(::Type{AuthParameters}, x::Dict) = AuthParameters(; (k => v for (k, v) in x)...)
+
 
 handle_conn_step(client::Client, params::AuthParameters, evt::Nothing) = nothing
 function handle_conn_step(client::Client, params::AuthParameters, evt)
@@ -50,13 +55,13 @@ function handle_conn_step(client::Client, params::AuthParameters, evt)
                 )
             )
         elseif typ == "authorizationStateWaitEncryptionKey"
-            send_method(client, :checkDatabaseEncryptionKey, key="")
+            send_method(client, :checkDatabaseEncryptionKey, key=params.encryption_key)
         elseif typ == "authorizationStateWaitPhoneNumber"
             send_method(client, :setAuthenticationPhoneNumber, phone_number=params.phone_number)
         elseif typ == "authorizationStateWaitCode"
-            send_method(client, :checkAuthenticationCode, code=Base.prompt("Authentication code"))
+            send_method(client, :checkAuthenticationCode, code=params.get_authentication_code())
         elseif typ == "authorizationStateWaitPassword"
-            send_method(client, :checkAuthenticationPassword, password=Base.prompt("Password"))
+            send_method(client, :checkAuthenticationPassword, password=params.get_password())
         else
             error("Unsupported authorization state received: $typ")
         end
