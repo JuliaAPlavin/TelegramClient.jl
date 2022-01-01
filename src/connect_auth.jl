@@ -1,6 +1,6 @@
-handle_conn_step(client::Client, params::AuthParameters, evt::Nothing) = nothing
+handle_conn_step(client::Client, evt::Nothing) = nothing
 
-function handle_conn_step(client::Client, params::AuthParameters, evt)
+function handle_conn_step(client::Client, evt)
     type = evt["@type"]
     if type == "ok"
         client.last_state = "$(client.last_state): ok"
@@ -33,8 +33,8 @@ function handle_conn_step(client::Client, params::AuthParameters, evt)
                     "use_message_database" => false,
                     "enable_storage_optimizer" => true,
                     "use_secret_chats" => false,
-                    "api_id" => params.api_id,
-                    "api_hash" => params.api_hash,
+                    "api_id" => client.auth_parameters.api_id,
+                    "api_hash" => client.auth_parameters.api_hash,
                     "system_language_code" => "en",
                     "device_model" => "Desktop",
                     "system_version" => "Linux",
@@ -42,13 +42,13 @@ function handle_conn_step(client::Client, params::AuthParameters, evt)
                 )
             )
         elseif typ == "authorizationStateWaitEncryptionKey"
-            send_method(client, :checkDatabaseEncryptionKey, key=params.encryption_key)
+            send_method(client, :checkDatabaseEncryptionKey, key=client.auth_parameters.encryption_key)
         elseif typ == "authorizationStateWaitPhoneNumber"
-            send_method(client, :setAuthenticationPhoneNumber, phone_number=params.phone_number)
+            send_method(client, :setAuthenticationPhoneNumber, phone_number=client.auth_parameters.phone_number)
         elseif typ == "authorizationStateWaitCode"
-            send_method(client, :checkAuthenticationCode, code=params.get_authentication_code())
+            send_method(client, :checkAuthenticationCode, code=client.auth_parameters.get_authentication_code())
         elseif typ == "authorizationStateWaitPassword"
-            send_method(client, :checkAuthenticationPassword, password=params.get_password())
+            send_method(client, :checkAuthenticationPassword, password=client.auth_parameters.get_password())
         else
             error("Unsupported authorization state received: $typ")
         end

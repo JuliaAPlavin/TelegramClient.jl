@@ -3,8 +3,10 @@ import JSON3
 using Test
 
 
+auth_params_empty = TG.AuthParameters(api_id=0, api_hash="", phone_number="")
+
 @testset "client basic" begin
-    TG.Client() do client
+    TG.Client(auth_parameters=auth_params_empty) do client
         @test TG.is_created(client)
         @test !TG.is_ready(client)
         @test TG.execute_method(client, :getLogVerbosityLevel)["@type"] == "logVerbosityLevel"
@@ -16,7 +18,7 @@ using Test
 end
 
 @testset "client destroy" begin
-    client = TG.Client()
+    client = TG.Client(auth_parameters=auth_params_empty)
     @test TG.is_created(client)
     TG.destroy(client)
     @test !TG.is_created(client)
@@ -31,9 +33,9 @@ end
     auth_file = joinpath(@__DIR__, "auth_params.json")
     if isfile(auth_file)
         params = JSON3.read(read(auth_file, String), TG.AuthParameters)
-        client = TG.Client()
+        client = TG.Client(auth_parameters=params)
         while !TG.is_ready(client)
-            TG.handle_conn_step(client, params, TG.receive(client, timeout=10))
+            TG.handle_conn_step(client, TG.receive(client, timeout=10))
         end
         @test TG.is_ready(client)
     end

@@ -1,10 +1,3 @@
-
-function Client()
-    ptr = @ccall libtdjson.td_json_client_create()::Ptr{Cvoid}
-    @assert ptr != C_NULL
-    return Client(tdlib_ptr=ptr)
-end
-
 function destroy(client::Client)
     @debug "Destroying"
     @ccall libtdjson.td_json_client_destroy(client.tdlib_ptr::Ptr{Cvoid})::Cvoid
